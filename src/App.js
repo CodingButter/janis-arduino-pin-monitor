@@ -1,24 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
+import { Typography, CssBaseline, Container, AppBar } from "@material-ui/core";
+import arduinos from "./arduinos.json";
+import Arduino from "./components/Arduino/Arduino";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <CssBaseline />
+      <AppBar position="sticky">
+        <Typography>My Arduinos</Typography>
+      </AppBar>
+      <Container>
+        {arduinos.map((arduino) => (
+          <Arduino key={arduino.name} arduino={arduino} />
+        ))}
+      </Container>
+    </>
   );
 }
 
