@@ -1,74 +1,35 @@
 import { useEffect, useState } from "react";
 import { Paper, Grid } from "@material-ui/core";
-
+const start = Date.now();
 export default function Arduino({ arduino }) {
   const [pinArray, setPinArray] = useState([]);
-  const [lastSent, setLastSent] = useState(Date.now());
+  const arduinoStatus = localStorage.getItem("arduino_status") === "true";
   const sendSMS = async (message) => {
-    const hoursPast = (Date.now() - lastSent) / 1000 / 60 / 60;
-    console.log({
-      hoursPast,
-      arduioTime: arduino.warningTime,
-    });
-    if (hoursPast < arduino.warningTime) return;
-    setLastSent(Date.now());
     console.log(message);
     /**
      * @TODO create fetch
      * fetch("endpoint",{body:message});
      */
   };
-
-  const comparePins = (previous, current) => {
-    var message = `${arduino.name} has a pin problem\n`;
-    var shouldSend = false;
-    previous.forEach((value, index) => {
-      const pinRules = arduino.rules[`p${index + 1}`];
-      if (pinRules) {
-        pinRules.forEach((pinRule) => {
-          switch (pinRule.condition) {
-            case ">":
-              if (current[index] > pinRule.value) {
-                message += `${pinRule.message}\n`;
-                shouldSend = true;
-              }
-              break;
-            case "<":
-              if (current[index] < pinRule.value) {
-                message += `${pinRule.message}\n`;
-                shouldSend = true;
-              }
-              break;
-            case "=":
-              if (current[index] === pinRule.value) {
-                message += `${pinRule.message}\n`;
-                shouldSend = true;
-              }
-              break;
-
-            default:
-              break;
-          }
-        });
-      } else {
-        if (index < 55 && current[index] !== value) shouldSend = true;
-      }
-    });
-    if (!shouldSend) return;
-    sendSMS(message);
-  };
+  let currentStatus = pinArray.includes(1);
+  if (
+    (Date.now() - start > 20000 && Date.now() - start < 45000) ||
+    (Date.now() - start > 50000 && Date.now() < 70000)
+  )
+    currentStatus = false;
+  if (arduinoStatus !== currentStatus)
+    sendSMS(`${arduino.name} status: ${currentStatus ? "on" : "off"}`);
+  localStorage.setItem("arduino_status", currentStatus);
 
   const fetchData = async () => {
-    const endpoint = process.env[`REACT_APP_${arduino.name}`];
+    const endpoint =
+      process.env[`REACT_APP_${arduino.name}`] || arduino.endpoint;
+
     const arduinoResponse = await fetch(endpoint);
     const jsonResponse = await arduinoResponse.json();
 
     const currentPinArray = jsonResponse.response.values;
-
-    setPinArray((previousPinArray) => {
-      comparePins(previousPinArray, currentPinArray);
-      return currentPinArray;
-    });
+    setPinArray(currentPinArray.slice(0, 54));
   };
 
   useEffect(() => {

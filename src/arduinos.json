@@ -1,28 +1,6 @@
 [
   {
     "name": "ARDUINO_1",
-    "endpoint": "set endpoint",
-    "warningTime": 3,
-    "rules": {
-      "p55": [
-        {
-          "condition": ">",
-          "value": 1024,
-          "message": "heat pin warning"
-        }
-      ],
-      "p60": [
-        {
-          "condition": "<",
-          "value": 500,
-          "message": "pin 60 warning under 500"
-        },
-        {
-          "condition": ">",
-          "value": 600,
-          "message": "pin 60 warning over 600"
-        }
-      ]
-    }
+    "endpoint": "set endpoint"
   }
 ]
